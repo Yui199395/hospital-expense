@@ -517,6 +517,7 @@
     }
 
     function deleteRecord(index) {
+      if (!confirm('确定删除这条就诊记录吗？')) return;
       const records = loadRecords();
       records.splice(index, 1);
       saveRecords(records);
