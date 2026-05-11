@@ -27,6 +27,10 @@
       -webkit-tap-highlight-color: transparent;
     }
 
+    html {
+      overflow-x: hidden;
+    }
+
     body {
       font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue", sans-serif;
       background: var(--bg);
@@ -109,8 +113,14 @@
       flex-wrap: wrap;
     }
 
+    .fee-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
     .input-group {
-      flex: 1 1 calc(50% - 5px);
       min-width: 0;
       display: flex;
       flex-direction: column;
@@ -326,13 +336,11 @@
   </div>
 
   <div class="input-section">
-    <div class="input-row">
-      <div class="input-group full">
-        <label>就诊日期</label>
-        <input type="date" id="dateInput">
-      </div>
+    <div class="input-group full">
+      <label>就诊日期</label>
+      <input type="date" id="dateInput">
     </div>
-    <div class="input-row">
+    <div class="fee-row">
       <div class="input-group">
         <label>医药费</label>
         <input type="number" id="medicalInput" placeholder="0.00" inputmode="decimal" min="0" step="0.01">
