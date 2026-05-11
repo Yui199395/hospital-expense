@@ -101,36 +101,42 @@
     }
 
     .input-row {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
+      display: flex;
       gap: 12px;
       margin-bottom: 12px;
     }
 
     .input-group {
+      flex: 1;
+      min-width: 0;
       display: flex;
       flex-direction: column;
     }
 
     .input-group.full {
-      grid-column: 1 / -1;
+      flex: none;
+      width: 100%;
     }
 
     .input-group label {
-      font-size: 0.8rem;
+      font-size: 0.75rem;
       color: var(--text-light);
       margin-bottom: 6px;
       font-weight: 500;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     .input-group input {
-      padding: 14px 16px;
+      padding: 12px 10px;
       border: 2px solid var(--border);
       border-radius: 12px;
-      font-size: 1.1rem;
+      font-size: 1rem;
       background: #FDFAF5;
       color: var(--text);
       transition: border-color 0.2s;
+      width: 100%;
     }
 
     .input-group input:focus {
