@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#FDF6E3">
+  <title>医院费用</title>
+  <style>
+    :root {
+      --bg: #FDF6E3;
+      --card: #FFFFFF;
+      --text: #5D4E37;
+      --text-light: #8B7355;
+      --medical: #E57373;
+      --transport: #64B5F6;
+      --accent: #7CB342;
+      --border: #E8DFD0;
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 16px;
+      padding-bottom: calc(80px + var(--safe-bottom));
+    }
+
+    .header {
+      text-align: center;
+      padding: 12px 0 20px;
+    }
+
+    .header h1 {
+      font-size: 1.4rem;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    /* Stats Cards */
+    .stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .stat-card {
+      background: var(--card);
+      border-radius: 16px;
+      padding: 16px;
+      text-align: center;
+      box-shadow: 0 2px 8px rgba(93, 78, 55, 0.08);
+    }
+
+    .stat-card.accent {
+      grid-column: 1 / -1;
+      background: linear-gradient(135deg, #7CB342 0%, #689F38 100%);
+      color: white;
+    }
+
+    .stat-label {
+      font-size: 0.8rem;
+      color: var(--text-light);
+      margin-bottom: 6px;
+    }
+
+    .stat-card.accent .stat-label {
+      color: rgba(255,255,255,0.85);
+    }
+
+    .stat-value {
+      font-size: 1.6rem;
+      font-weight: 700;
+    }
+
+    .stat-card.accent .stat-value {
+      font-size: 2rem;
+    }
+
+    .stat-value.medical { color: var(--medical); }
+    .stat-value.transport { color: var(--transport); }
+
+    /* Input Section */
+    .input-section {
+      background: var(--card);
+      border-radius: 20px;
+      padding: 20px;
+      margin-bottom: 16px;
+      box-shadow: 0 2px 12px rgba(93, 78, 55, 0.1);
+    }
+
+    .input-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .input-group {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .input-group.full {
+      grid-column: 1 / -1;
+    }
+
+    .input-group label {
+      font-size: 0.8rem;
+      color: var(--text-light);
+      margin-bottom: 6px;
+      font-weight: 500;
+    }
+
+    .input-group input {
+      padding: 14px 16px;
+      border: 2px solid var(--border);
+      border-radius: 12px;
+      font-size: 1.1rem;
+      background: #FDFAF5;
+      color: var(--text);
+      transition: border-color 0.2s;
+    }
+
+    .input-group input:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+
+    .btn-add {
+      width: 100%;
+      padding: 16px;
+      background: linear-gradient(135deg, #7CB342 0%, #689F38 100%);
+      color: white;
+      border: none;
+      border-radius: 14px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: 0 4px 16px rgba(124, 179, 66, 0.35);
+      transition: transform 0.15s;
+    }
+
+    .btn-add:active {
+      transform: scale(0.98);
+    }
+
+    /* Records Section */
+    .records-section {
+      background: var(--card);
+      border-radius: 20px;
+      padding: 20px;
+      box-shadow: 0 2px 12px rgba(93, 78, 55, 0.1);
+    }
+
+    .records-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+
+    .records-header h2 {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .btn-clear {
+      padding: 8px 14px;
+      background: #FFEBEE;
+      color: #D32F2F;
+      border: none;
+      border-radius: 8px;
+      font-size: 0.8rem;
+      font-weight: 500;
+      cursor: pointer;
+    }
+
+    .record-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      max-height: 45vh;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .record-item {
+      display: flex;
+      align-items: center;
+      padding: 14px;
+      background: #FDFAF5;
+      border-radius: 12px;
+    }
+
+    .record-date {
+      font-weight: 600;
+      font-size: 0.95rem;
+      min-width: 100px;
+      color: var(--text);
+    }
+
+    .record-fees {
+      flex: 1;
+      display: flex;
+      gap: 16px;
+    }
+
+    .fee-item {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 0.9rem;
+    }
+
+    .fee-icon {
+      font-size: 0.75rem;
+      padding: 3px 6px;
+      border-radius: 4px;
+      font-weight: 600;
+    }
+
+    .fee-icon.medical {
+      background: #FFEBEE;
+      color: var(--medical);
+    }
+
+    .fee-icon.transport {
+      background: #E3F2FD;
+      color: var(--transport);
+    }
+
+    .btn-delete {
+      width: 36px;
+      height: 36px;
+      background: transparent;
+      color: #BCAAA4;
+      border: none;
+      border-radius: 50%;
+      font-size: 1.3rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+    }
+
+    .btn-delete:active {
+      background: #FFEBEE;
+      color: #D32F2F;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 32px 16px;
+      color: var(--text-light);
+      font-size: 0.9rem;
+    }
+
+    .empty-state::before {
+      content: "📋";
+      display: block;
+      font-size: 2.5rem;
+      margin-bottom: 10px;
+    }
+
+    /* Month Group */
+    .month-group {
+      margin-bottom: 16px;
+    }
+
+    .month-title {
+      font-size: 0.8rem;
+      color: var(--text-light);
+      font-weight: 500;
+      padding: 8px 0;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>🏥 医院费用记录</h1>
+  </div>
+
+  <div class="stats">
+    <div class="stat-card">
+      <div class="stat-label">医药费</div>
+      <div class="stat-value medical" id="totalMedical">¥0.00</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">交通费</div>
+      <div class="stat-value transport" id="totalTransport">¥0.00</div>
+    </div>
+    <div class="stat-card accent">
+      <div class="stat-label">累计总费用</div>
+      <div class="stat-value" id="totalAmount">¥0.00</div>
+    </div>
+  </div>
+
+  <div class="input-section">
+    <div class="input-row">
+      <div class="input-group full">
+        <label>就诊日期</label>
+        <input type="date" id="dateInput">
+      </div>
+    </div>
+    <div class="input-row">
+      <div class="input-group">
+        <label>医药费</label>
+        <input type="number" id="medicalInput" placeholder="0.00" inputmode="decimal" min="0" step="0.01">
+      </div>
+      <div class="input-group">
+        <label>交通费</label>
+        <input type="number" id="transportInput" placeholder="0.00" inputmode="decimal" min="0" step="0.01">
+      </div>
+    </div>
+    <button class="btn-add" id="addBtn">添加记录</button>
+  </div>
+
+  <div class="records-section">
+    <div class="records-header">
+      <h2>就诊记录</h2>
+      <button class="btn-clear" id="clearAll">清空</button>
+    </div>
+    <div id="recordList" class="record-list">
+      <div class="empty-state">暂无记录</div>
+    </div>
+  </div>
+
+  <script>
+    const STORAGE_KEY = 'hospital_expenses_v2';
+
+    const dateInput = document.getElementById('dateInput');
+    const medicalInput = document.getElementById('medicalInput');
+    const transportInput = document.getElementById('transportInput');
+    const addBtn = document.getElementById('addBtn');
+    const recordList = document.getElementById('recordList');
+    const totalMedicalEl = document.getElementById('totalMedical');
+    const totalTransportEl = document.getElementById('totalTransport');
+    const totalAmountEl = document.getElementById('totalAmount');
+    const clearAllBtn = document.getElementById('clearAll');
+
+    dateInput.valueAsDate = new Date();
+
+    function loadRecords() {
+      const data = localStorage.getItem(STORAGE_KEY);
+      return data ? JSON.parse(data) : [];
+    }
+
+    function saveRecords(records) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(records));
+    }
+
+    function formatDate(dateStr) {
+      const date = new Date(dateStr);
+      const month = date.getMonth() + 1;
+      const day = date.getDate();
+      const week = ['日','一','二','三','四','五','六'][date.getDay()];
+      return `${month}月${day}日 周${week}`;
+    }
+
+    function formatMoney(amount) {
+      return `¥${parseFloat(amount || 0).toFixed(2)}`;
+    }
+
+    function getMonthKey(dateStr) {
+      const date = new Date(dateStr);
+      return `${date.getFullYear()}年${date.getMonth() + 1}月`;
+    }
+
+    function renderRecords() {
+      const records = loadRecords();
+
+      if (records.length === 0) {
+        recordList.innerHTML = '<div class="empty-state">暂无记录</div>';
+        return;
+      }
+
+      const sorted = [...records].sort((a, b) => new Date(b.date) - new Date(a.date));
+
+      const grouped = {};
+      sorted.forEach(record => {
+        const monthKey = getMonthKey(record.date);
+        if (!grouped[monthKey]) grouped[monthKey] = [];
+        grouped[monthKey].push(record);
+      });
+
+      let html = '';
+      for (const [month, items] of Object.entries(grouped)) {
+        html += `<div class="month-group"><div class="month-title">${month}</div>`;
+        items.forEach(record => {
+          const index = records.indexOf(record);
+          html += `
+            <div class="record-item">
+              <div class="record-date">${formatDate(record.date)}</div>
+              <div class="record-fees">
+                <div class="fee-item">
+                  <span class="fee-icon medical">药</span>
+                  <span>${formatMoney(record.medical)}</span>
+                </div>
+                <div class="fee-item">
+                  <span class="fee-icon transport">行</span>
+                  <span>${formatMoney(record.transport)}</span>
+                </div>
+              </div>
+              <button class="btn-delete" data-index="${index}">×</button>
+            </div>
+          `;
+        });
+        html += '</div>';
+      }
+
+      recordList.innerHTML = html;
+
+      document.querySelectorAll('.btn-delete').forEach(btn => {
+        btn.addEventListener('click', () => deleteRecord(parseInt(btn.dataset.index)));
+      });
+    }
+
+    function updateStats() {
+      const records = loadRecords();
+      const totals = records.reduce((acc, record) => ({
+        medical: acc.medical + parseFloat(record.medical || 0),
+        transport: acc.transport + parseFloat(record.transport || 0)
+      }), { medical: 0, transport: 0 });
+
+      totalMedicalEl.textContent = formatMoney(totals.medical);
+      totalTransportEl.textContent = formatMoney(totals.transport);
+      totalAmountEl.textContent = formatMoney(totals.medical + totals.transport);
+    }
+
+    function addRecord() {
+      const record = {
+        date: dateInput.value,
+        medical: parseFloat(medicalInput.value) || 0,
+        transport: parseFloat(transportInput.value) || 0
+      };
+
+      if (!record.date) {
+        alert('请选择日期');
+        return;
+      }
+
+      const records = loadRecords();
+      records.push(record);
+      saveRecords(records);
+
+      renderRecords();
+      updateStats();
+
+      medicalInput.value = '';
+      transportInput.value = '';
+      dateInput.valueAsDate = new Date();
+      dateInput.focus();
+    }
+
+    function deleteRecord(index) {
+      const records = loadRecords();
+      records.splice(index, 1);
+      saveRecords(records);
+      renderRecords();
+      updateStats();
+    }
+
+    addBtn.addEventListener('click', addRecord);
+
+    medicalInput.addEventListener('keydown', e => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        transportInput.focus();
+      }
+    });
+
+    transportInput.addEventListener('keydown', e => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        addRecord();
+      }
+    });
+
+    clearAllBtn.addEventListener('click', () => {
+      if (confirm('确定清空所有记录？')) {
+        saveRecords([]);
+        renderRecords();
+        updateStats();
+      }
+    });
+
+    renderRecords();
+    updateStats();
+  </script>
+</body>
+</html>
