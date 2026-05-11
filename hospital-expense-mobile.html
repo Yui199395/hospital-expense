@@ -269,6 +269,14 @@
       color: var(--transport);
     }
 
+    .record-note {
+      font-size: 0.8rem;
+      color: var(--text-light);
+      padding: 4px 0 8px 12px;
+      border-left: 3px solid var(--accent);
+      margin-top: -4px;
+    }
+
     .btn-delete {
       width: 36px;
       height: 36px;
@@ -353,6 +361,10 @@
         <input type="number" id="transportInput" placeholder="0.00" inputmode="decimal" min="0" step="0.01">
       </div>
     </div>
+    <div class="input-group full">
+      <label>备注（选填）</label>
+      <input type="text" id="noteInput" placeholder="如：挂号费、药名等" maxlength="50">
+    </div>
     <button class="btn-add" id="addBtn">添加记录</button>
   </div>
 
@@ -372,6 +384,7 @@
     const dateInput = document.getElementById('dateInput');
     const medicalInput = document.getElementById('medicalInput');
     const transportInput = document.getElementById('transportInput');
+    const noteInput = document.getElementById('noteInput');
     const addBtn = document.getElementById('addBtn');
     const recordList = document.getElementById('recordList');
     const totalMedicalEl = document.getElementById('totalMedical');
@@ -407,6 +420,12 @@
       return `${date.getFullYear()}年${date.getMonth() + 1}月`;
     }
 
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
     function renderRecords() {
       const records = loadRecords();
 
@@ -429,6 +448,7 @@
         html += `<div class="month-group"><div class="month-title">${month}</div>`;
         items.forEach(record => {
           const index = records.indexOf(record);
+          const noteHtml = record.note ? `<div class="record-note">${escapeHtml(record.note)}</div>` : '';
           html += `
             <div class="record-item">
               <div class="record-date">${formatDate(record.date)}</div>
@@ -444,6 +464,7 @@
               </div>
               <button class="btn-delete" data-index="${index}">×</button>
             </div>
+            ${noteHtml}
           `;
         });
         html += '</div>';
@@ -472,7 +493,8 @@
       const record = {
         date: dateInput.value,
         medical: parseFloat(medicalInput.value) || 0,
-        transport: parseFloat(transportInput.value) || 0
+        transport: parseFloat(transportInput.value) || 0,
+        note: noteInput.value.trim()
       };
 
       if (!record.date) {
@@ -489,6 +511,7 @@
 
       medicalInput.value = '';
       transportInput.value = '';
+      noteInput.value = '';
       dateInput.valueAsDate = new Date();
       dateInput.focus();
     }
