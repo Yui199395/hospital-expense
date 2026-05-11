@@ -6,7 +6,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="theme-color" content="#FDF6E3">
-  <title>医院费用</title>
+  <title>集爱费用</title>
   <style>
     :root {
       --bg: #FDF6E3;
@@ -199,23 +199,27 @@
 
     .record-item {
       display: flex;
+      flex-wrap: wrap;
       align-items: center;
-      padding: 14px;
+      padding: 12px;
       background: #FDFAF5;
       border-radius: 12px;
+      gap: 8px;
     }
 
     .record-date {
       font-weight: 600;
-      font-size: 0.95rem;
-      min-width: 100px;
+      font-size: 0.9rem;
+      min-width: 85px;
       color: var(--text);
     }
 
     .record-fees {
       flex: 1;
       display: flex;
-      gap: 16px;
+      gap: 10px;
+      flex-wrap: wrap;
+      min-width: 0;
     }
 
     .fee-item {
@@ -293,7 +297,7 @@
 </head>
 <body>
   <div class="header">
-    <h1>🏥 医院费用记录</h1>
+    <h1>🏥 集爱费用记录</h1>
   </div>
 
   <div class="stats">
